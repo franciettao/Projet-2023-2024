@@ -1,0 +1,45 @@
+Pour automatiser le processus de "push" (téléchargement d'une image depuis la console Linux vers Docker Hub) et "pull" (téléchargement d'une image depuis Docker Hub vers la console Linux) de conteneurs, vous pouvez utiliser les commandes Docker appropriées dans un script shell. Voici un script simple pour effectuer ces opérations :
+
+bash
+Copy code
+#!/bin/bash
+
+# Identifiants Docker Hub (remplacez par les vôtres)
+DOCKER_HUB_USERNAME="votre_nom_utilisateur"
+DOCKER_HUB_PASSWORD="votre_mot_de_passe"
+
+# Nom de l'image du conteneur
+IMAGE_NAME="nom_de_votre_image"
+
+# Construire une image Docker (par exemple, à partir d'un Dockerfile)
+docker build -t $IMAGE_NAME .
+
+# Se connecter à Docker Hub (vous n'avez besoin de le faire qu'une fois)
+echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+
+# Poussez l'image vers Docker Hub
+docker push $DOCKER_HUB_USERNAME/$IMAGE_NAME
+
+# Supprimer l'image locale (facultatif)
+docker rmi $IMAGE_NAME
+
+# Déconnexion de Docker Hub (facultatif)
+docker logout
+
+# Tirer (pull) l'image depuis Docker Hub
+docker pull $DOCKER_HUB_USERNAME/$IMAGE_NAME
+Assurez-vous de personnaliser les variables DOCKER_HUB_USERNAME et DOCKER_HUB_PASSWORD avec vos informations de compte Docker Hub. Le script effectue les opérations suivantes :
+
+Il construit une image Docker à partir d'un Dockerfile local (assurez-vous que le Dockerfile se trouve dans le répertoire où vous exécutez le script).
+
+Il se connecte à Docker Hub en utilisant vos identifiants (vous pouvez le faire une seule fois).
+
+Il pousse (push) l'image vers Docker Hub en utilisant le nom de l'image que vous avez spécifié.
+
+Il supprime l'image locale (optionnel, vous pouvez laisser l'image locale si vous le souhaitez).
+
+Il se déconnecte de Docker Hub (optionnel, vous pouvez le faire pour des raisons de sécurité).
+
+Il tire (pull) l'image depuis Docker Hub en utilisant le nom de l'image que vous avez spécifié.
+
+Exécutez le script en utilisant bash script.sh. Assurez-vous que Docker est installé et que vous avez une image Docker à construire. Le script suppose également que vous avez déjà un compte Docker Hub.
