@@ -1,0 +1,25 @@
+L’URL d’administration de son site WordPress est par défaut « https://mon-site/wp-login.php« . Le problème avec l’utilisation par défaut de cette URL de connexion vers la plateforme d’administration est générique donc elle peut devenir victime d’une attaque de ‘bruteforce‘. Pour éviter ces attaques, il est conseillé de changer cette URL. Le fait de changer l’URL d’administration de son site WordPress permet de ralentir l’attaquant qui ciblerait votre site.
+
+wordpress changer url administration
+Prérequis pour changer l’url d’administration de Wordpres :
+Un accès a la modification des fichiers de son site WordPress
+Changer l’url d’administration de WordPress :
+Rendez-vous dans l’emplacement qui contient les données de votre site puis copier le fichier wp-login.php en wp-login.php.old et placer le sur un autre périphérique de stockage. Le fait de copier le fichier permet de faire un retour en arrière en cas de soucis.
+
+Ensuite renommer le fichier wp-login.php en votre-nouvel-acces.php
+
+Dans votre-nouvel-acces.php remplacer dans le fichier tous les ‘wp-login’ par ‘votre-nouvel-acces’
+
+Si vous avez un message d’erreur en vous déconnectant de WordPress :
+Si vous avez un message d’erreur après avoir réalisé la modification alors vous devez remplacer wp-login.php par votre-nouvel-acces.php dans le fichier wp-includes/general-template.php
+
+Conseil :
+Après chaque mise à jour de WordPress il faut réaliser la modification. Ensuite je vous conseille d’utiliser également un plugin qui bloque les attaques de Brute-force. Je vous conseille également d’utiliser un compte qui possède un nom d’utilisateur différent de ‘Admin’. Il s’agit du nom d’utilisateur principalement utilisé. Il est aussi recommandé d’avoir plusieurs comptes avec des permissions différentes. Pour limiter les accès au pirate qui peut potentiellement prendre l’accès au site.
+
+Je vous recommande également de désactiver XML-RPC pour votre site web si vous ne l’utilisez pas : WordPress Désactiver wp_xmlrpc.
+
+En plus de sécuriser votre site, je vous recommande de réaliser régulièrement des sauvegardes de votre site ainsi que de sa base de données. Avoir des sauvegardes permet de remonter votre site en cas de défiguration ou de défaillance système (Ex : incendie de chez OVH). Les sauvegardes du site et de la base de données doivent être présentes sur un autre périphérique de stockage que le serveur qui contient déjà le site.
+
+Source :
+
+https://fr.wordpress.org/support/
