@@ -1,0 +1,68 @@
+Installer WordPress sur Debian 11
+/ Debian, Wordpress / Par Aymeric Cucherousset
+Dans cette procédure, je vais vous expliquer pas à pas comment installer WordPress sur une machine Debian 11. Après avoir suivi cette procédure vous aurez une machine Debian avec WordPress d’installer. En cas de soucis, je vous conseil de consulter le site officiel : https://wordpress.com/
+
+Logo WordPress
+Prérequis :
+Une machine Debian 11
+Un serveur Lamp
+Un accès root sur la machine
+Installation de WordPress sur Debian 11
+WordPress est un CMS qui utilise une base de données pour stocker tous les articles, utilisateurs et autres… Pour notre utilisation nous allons installer Mariadb, qui est très similaire avec Mysql.
+
+MariaDB :
+Connexion sur MariaDb :
+
+mysql -u root -p
+Création d’une nouvelle base de données :
+
+CREATE DATABASE wordpress_db;
+Création d’un nouvel utilisateur MariaDB et attribution des droits sur la nouvelle base de données :
+
+GRANT ALL ON wordpress_db.* TO 'wordpress_user'@'localhost' IDENTIFIED BY 'password';
+Appliquer les privilèges :
+
+FLUSH PRIVILEGES;
+Quitter MariaDB :
+
+EXIT;
+Se diriger dans le répertoire /var/www/html :
+
+cd /var/www/html/
+Installer WordPress sur Debian 11 :
+Télécharger WordPress :
+
+curl -O https://wordpress.org/latest.tar.gz
+Décompression de l’archive de WordPress
+
+tar -xvf latest.tar.gz
+Suppression de l’archive :
+
+rm latest.tar.gz
+Attribution des droits au serveur Web :
+
+chown -R www-data:www-data /var/www/html/wordpress
+Rendez-vous dans le dossier WordPress :
+
+cd wordpress
+Copie du fichier de configuration :
+
+cp wp-config-sample.php wp-config.php
+Édition du fichier de configuration :
+
+installer wordpress sur debian
+Suppression du fichier readme.html
+
+rm /var/www/html/wordpress/readme.html
+Installation de modules php pour WordPress :
+
+apt install php-gd php-intl php-mbstring php-imagick
+Puis redémarrer Apache :
+
+systemctl restart apache2
+Depuis votre navigateur vous devriez accéder à la configuration de WordPress :
+
+http://votreip/wordpress
+Avant la publication de WordPress sur le Web, il est conseillé de faire quelques opérations en plus d’un serveur Web. La première chose à faire est d’activer une extension qui empêchera les tentatives d’attaque par brute force. La seconde sera de modifier l’accès admin par un autre emplacement, des extensions permettent de le faire. La troisième sera de ne pas avoir de comptes qui contiennent « admin » ou des mots de passe faibles.
+
+Je déconseille l’hébergement d’un site WordPress sur votre réseau, le moindre oublie de sécurité peut laisser la possibilité à un attaquant de contrôler votre machine / réseau.
