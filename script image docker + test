@@ -1,0 +1,27 @@
+
+# Arrêtez et supprimez le conteneur
+docker stop mon_conteneur
+docker rm mon_conteneur
+
+# Vous pouvez également publier l'image sur Docker Hub si nécessaire
+# docker login -u VOTRE_NOM_UTILISATEUR -p VOTRE_MOT_DE_PASSE
+# docker tag $IMAGE_NAME VOTRE_NOM_UTILISATEUR/$IMAGE_NAME
+# docker push VOTRE_NOM_UTILISATEUR/$IMAGE_NAME
+
+# Supprimez l'image locale si nécessaire
+docker rmi $IMAGE_NAME
+Ce script effectue les opérations suivantes :
+
+Il construit une image Docker à partir du Dockerfile spécifié dans le répertoire indiqué.
+
+Il exécute un conteneur à partir de l'image nouvellement créée.
+
+Il exécute des commandes de test dans le conteneur. Vous devriez remplacer cette commande par vos propres tests.
+
+Il arrête et supprime le conteneur.
+
+Il supprime l'image locale si nécessaire.
+
+Vous pouvez personnaliser le nom de l'image, le chemin vers le Dockerfile, les commandes de test, etc., en fonction de vos besoins.
+
+Assurez-vous d'exécuter le script en tant qu'utilisateur avec des privilèges Docker, ou ajoutez votre utilisateur au groupe Docker si nécessaire.
