@@ -1,0 +1,29 @@
+Lors de la mise en production d’une application, il a souvent des fichiers de configuration à éditer, voir des modifications d’application pour fixer un bug. Si vous n’êtes pas familier des outils tels que Nano ou Vi/Vim alors vous connecter en SSH sur votre serveur à l’aide VSCode et de pouvoir éditer vos fichier directement vas vous faciliter la vie !
+
+vscode ssh
+Prérequis :
+Un serveur qui possède une authentification SSH avec une clé publique
+Une machine cliente avec l’IDE Visual Studio Code
+Installation de l’extension Remote – SSH:
+Pour installer l’extension Remote – SSH, démarrer VSCode et ensuite il existe deux méthodes :
+
+L’installation avec une commande :
+Saisir le raccourcis CTRL + P et saisir la commande :
+
+ext install ms-vscode-remote.remote-ssh
+L’installation avec l’interface graphique :
+Installer remote ssh sur vscode
+1 : Aller dans le menu des extensions VSCode
+2 : Rechercher l’extension Remote-SSH
+3 : Cliquer sur le bouton vert ‘Installer’
+
+Se connecter à une machine en SSH depuis VSCode :
+vscode ssh
+1 : Cliquer sur l’icône de l’explorateur distant
+2 : Cliquer sur le bouton d’ajout d’explorateur distant
+3 : Ajouter la commande de connexion Ssh
+
+Ensuite il faut cliquer sur votre Hote pour s’y connecter et éditer vos fichier.
+
+Conseil :
+Utiliser une connexion SSH avec une clé publique permet d’éviter de devoir saisir le mot de passe en claire dans VSCode.
