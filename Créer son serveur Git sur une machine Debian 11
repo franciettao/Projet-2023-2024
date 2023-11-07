@@ -1,0 +1,55 @@
+Dans cette procédure je vais vous montrer comment créer votre serveur Git en local sur une machine Debian 11. Cette méthode va vous permettre de sauvegarder les données de vos codes développés sans passer par un service tiers qui pourrait accéder à vos données confidentielles.
+
+Logo git
+Prérequis :
+Une machine Debian 11
+Créer son serveur Git sur une machine Debian 11 :
+Avant de procéder à la configuration de Git sur notre machine, nous allons d’abord la mettre à jour.
+
+apt update
+Puis nous allons installer Git sur la machine :
+
+apt install git -y
+Ensuite nous allons créer un utilisateur Debian « git » :
+
+adduser git
+Créer son serveur Git sur Debian 11 - Nouvel utilisateur 
+Ensuite nous allons nous connecter avec notre nouvel utilisateur :
+
+su - git
+Puis nous allons créer le répertoire ‘.ssh‘ au niveau du répertoire de l’utilisateur :
+
+mkdir .ssh
+Ensuite nous allons changer les droits du répertoire afin que seul l’utilisateur courant soit autoriser sur le répertoire :
+
+chmod 700 .ssh
+Enfin nous allons créer le fichier authorized_keys dans le répertoire .ssh :
+
+touch .ssh/authorized_keys
+Ensuite nous modifions lers permissions sur ce nouveau fichier :
+
+chmod 600 .ssh/authorized_keys
+Puis depuis la machine qui est utilisée pour le développement de nos applications, nous allons autoriser notre machine avec une clé public Ssh :
+
+ssh -p custom-port-ou-22 git@ip-ou-dns-serveur-git
+Création de son dépôt GIT depuis le serveur Debian :
+Depuis le serveur nous allons créer un dossier (dans le répertoire utilisateur) correspondant à notre projet :
+
+mkdir projet.git
+Ensuite nous allons nous rendre dans le dans le dossier :
+
+cd projet.git
+Ensuite nous allons commencer notre projet Git avec l’instruction bare (détail de l’utilisation de l’instruction bare):
+
+git init --bare
+Connecter sa machine de développement au dépôt Git :
+Depuis notre machine de développement nous allons cloner le dépôt du serveur :
+
+git clone ssh://git@ip-ou-dns:port/home/git/projet.git
+Vous pouvez maintenant faire vos Commits et vos Push sur votre serveur.
+
+Je vous conseille de stocker votre code sur un Nas afin de garantir la pérennité de vos données, ainsi que de sécuriser votre serveur Git en conséquence.
+
+Sources :
+
+https://git-scm.com/docs
