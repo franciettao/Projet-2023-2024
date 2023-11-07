@@ -1,0 +1,33 @@
+Installer Portainer sur Docker
+/ Virtualisation et docker / Par Aymeric Cucherousset
+Dans cette procédure, je vais vous montrer et expliquer comment installer Portainer.io sur Docker. Installer Portainer sur Docker permet de faciliter la gestion des containers. Portainer est une interface graphique pour gérer les containers installés sur une machine. Avec Portainer il est également possible de gérer ses clusters Docker depuis une interface Web facile à installer sur n’importe quel Système d’exploitation.
+
+Logo Portainer
+Prérequis :
+Une machine avec Docker installé
+Installation de Portainer sur Docker :
+Pour commencer l’installation de Portainer, il faut créer un nouveau volume Docker sur votre machine qui va héberger Portainer :
+
+docker volume create portainer_data
+Ensuite, il faudra démarrer un container avec l’image : portainer/portainer-ce
+
+docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+Vérifier que votre container à bien démarrer avec la commande : docker ps
+
+Docker Portainer Ps
+Depuis un navigateur vous pouvez désormais accéder à portainer.io : http://votre-ip:9000
+
+Portainer.io first install
+Connectez-vous, puis sur la prochaine page choisissez le menu « Get Started » :
+
+Installer Portainer.io sur Docker
+Puis dans la catégorie « local » vous y trouverez vos containers et images présents sur cette machine.
+
+Installer Portainer.io sur Docker
+Depuis cet accès vous pouvez intégralement gérer vos containers, images, volumes et réseaux.
+
+Installer Portainer.io sur Docker
+Source :
+
+https://docs.portainer.io/
+Note : Portainer peut être installé sur toutes les machines qui possèdent Docker. Il existe également des alternatives à Portainer comme l’outil Yacht.
