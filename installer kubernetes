@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Mise à jour du système
+sudo apt update
+sudo apt upgrade -y
+
+# Installation de Docker (prérequis pour Kubernetes)
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Installation de kubeadm, kubelet et kubectl (composants Kubernetes)
+sudo apt-get update && sudo apt-get install -y apt-transport-https
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+
+# Initialisation du nœud maître Kubernetes (remplacez <IP_Du_Noeud> par l'adresse IP de votre machine)
+sudo kubeadm init --pod-network-cidr=10.244.0.0 --apiserver-advertise-address=<IP_Du_Noeud>
+
+# Configuration kubectl pour l'utilisateur courant
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Installer un réseau de conteneurs (Flannel)
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# Afficher le jeton de rejoignement pour les nœuds ouvriers
+kubeadm token create --print-join-command
