@@ -1,0 +1,160 @@
+Api-Platform Symfony 6
+/ Symfony 6 / Par Aymeric Cucherousset
+Dans cette procédure, je vais vous expliquer comment rapidement créer une API avec Api-Platform et Symfony 6. Api-Platform est un framework qui est basé sur Symfony qui est utilisé de manière à créer des API (application programming interface ou « interface de programmation d’application »).
+
+Logo Api-Platform
+Prérequis :
+Avoir installer Symfony et Composer
+Avoir installer une base de données (Debian/Windows)
+Création du projet :
+Avant de se lancer dans la création d’un API pour Symfony, il faut déjà connaître Symfony.
+
+Dans un premier temps nous allons créer un nouveau projet :
+
+symfony new projet_api_platform
+Ensuite nous allons nous rendre dans le dossier de l’application :
+
+cd projet_api_platform
+Import de nos dépendances :
+
+composer require symfony/orm-pack
+composer require --dev symfony/maker-bundle
+Nous allons ensuite configurer le fichier .env avec nous données pour la base de données :
+
+DATABASE_URL="mysql://nom_utilisateur:mot_de_passe@127.0.0.1:3306/nom_bdd?serverVersion=version_mariadb&charset=utf8mb4"
+ 
+avec mes valeurs 
+ 
+DATABASE_URL="mysql://symfony:password@127.0.0.1:3306/projet_api_platforme?serverVersion=mariadb-10.5.15&charset=utf8mb4"
+Enfin dans Symfony, nous allons créer notre première entité qui aura la structure suivante :
+
+Article(id, date_publication, titre, contenu)
+
+id: int
+date_publication : Date
+titre : Varchar (50)
+contenu : Text
+La clé primaire id va être créer automatiquement donc il ne faudra pas la créer dans console Symfony.
+
+Pour créer nôtre entité, nous allons saisir la commande suivante :
+
+symfony console make:entity
+ Class name of the entity to create or update (e.g. GrumpyPizza):
+ > Article
+
+ created: src/Entity/Article.php
+ created: src/Repository/ArticleRepository.php
+ 
+ Entity generated! Now let's add some fields!
+ You can always add more fields later manually or by re-running this command.
+
+ New property name (press <return> to stop adding fields):
+ > date_publication
+
+ Field type (enter ? to see all types) [string]:
+ > date
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > no
+
+ updated: src/Entity/Article.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > titre
+
+ Field type (enter ? to see all types) [string]:
+ > string
+
+ Field length [255]:
+ > 50
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > no
+
+ updated: src/Entity/Article.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > contenu
+
+ Field type (enter ? to see all types) [string]:
+ > text
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > no
+
+ updated: src/Entity/Article.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > 
+
+
+           
+  Success! 
+           
+
+ Next: When you're ready, create a migration with php bin/console make:migration
+Puis on va créer la base de données :
+
+symfony console d:d:c
+Ensuite on peut créer une migration Symfony :
+
+symfony console make:migration
+Et enfin si tous ce passe bien, alors nous pouvons migrer la base de données :
+
+symfony console d:m:m
+Si vous avez besoin de plus de détails pour comprendre cette première étape, je vous invite à voir la procédure : Symfony 6 Créer une entité
+
+Intégration d’Api-Platform dans le projet Symfony 6
+Pour commencer l’intégration d’Api-Platform dans nôtre projet, nous allons l’importer avec composer :
+
+composer require api
+Ensuite vous pouvez démarrer votre serveur Symfony :
+
+symfony serve
+Puis ensuite rendez-vous sur la page web dans la route /api (http://127.0.0.1:8000/api)
+
+Api-Platform Symfony 6 - Première installation
+Pour continuer, nous allons nous rendre dans le dossier src/Entity et modifier notre entité Article.
+
+Dans un premier temps, nous allons ajouter cette ligne :
+
+use ApiPlatform\Core\Annotation\ApiResource;
+// Depuis la dernière version de Api Platform : 
+use ApiPlatform\Metadata\ApiResource;
+Api-Platform Symfony 6 - Ajout de l'utilisation des annotation ApiPlateforme
+Puis ensuite nous allons ajouter l’annotation :
+
+#[ApiResource]
+Api-Platform Symfony 6 - Ajout de l'utilisation des annotation ApiPlateforme
+Et donc maintenant si nous retournons sur notre page web sur la route /api et que nous actualisons la page.
+Nous avons l’API qui c’est construite :
+
+Api-Platform Symfony 6 - Aide API
+Utilisation de l’API à l’aide de l’interface API-Platform :
+Nous n’avons pas entré de valeur dans notre base de données, mais nous allons pouvoir ajouter des valeurs grâce à l’interface web.
+
+Pour créer une valeur dans l’API avec l’interface web API-Platforme et Symfony 6:
+Dérouler la section : Creates a Article resource.
+
+Puis cliquer sur le bouton Try it out
+
+Enfin saisissez vos valeurs :
+
+Api-Platform Symfony 6 - Création de données
+Et pour valider appuyer sur le bouton Execute
+
+Une fois le formulaire valider, vous allez recevoir les informations à propos de la requête exécute :
+
+Création de données résultat
+Récupérer les articles avec Api-Platform et Symfony 6:
+Maintenant que nous avons créé un article dans notre Base de données à l’aide de nôtre API, nous pouvons consulter la liste des articles.
+
+Pour commencer il faut se rendre dans la section : Retrieves the collection of Article resources.
+
+Et ensuite il faut juste appuyer sur le bouton Execute, nous retrouvons bien l’article précédemment créé.
+
+Api-Platform Symfony 6 - Récupération de données
+Sources :
+
+https://api-platform.com/
+https://symfony.com/doc/current/index.html
