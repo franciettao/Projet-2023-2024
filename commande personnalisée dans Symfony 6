@@ -1,0 +1,146 @@
+Dans cette procédure, je vais vous expliquer comment créer une commande personnalisée dans Symfony 6. Créer une commande dans Symfony vous permettra d’exécuter des instructions depuis la ligne de commande. Pour concevoir une commande, il est possible d’utiliser le MakerBundle afin de générer automatiquement la structure de la classe de la commande. Depuis une commande il est possible d’appeler un service afin d’éviter les répétitions de code. Il est également possible de passer des arguments et des options à votre commande.
+
+Logo Symfony
+Prérequis pour faire une commande avec Symfony 6 :
+Avoir un projet Symfony 6
+Symfony 6 Créer une Commande :
+Pour concevoir une commande personnalisée dans Symfony 6, il est possible de le faire soit avec le MakerBundle ou manuellement. Dans cette procédure, je vais vous expliquer les deux méthodes pour construire vos commandes personnalisées.
+
+Avec le MakerBundle :
+Si le MakerBundle n’est pas installé, veuillez saisir la commande suivante pour l’installer :
+
+composer require --dev symfony/maker-bundle
+Ensuite saisissez la commande suivante pour créer votre commande :
+
+symfony console make:command
+Puis répondez au questionnaire qui vous est demandé :
+
+Choose a command name (e.g. app:grumpy-gnome):
+ > app:create-user
+
+ created: src/Command/CreateUserCommand.php
+
+           
+  Success! 
+           
+
+ Next: open your new command class and customize it!
+ Find the documentation at https://symfony.com/doc/current/console.html
+Ensuite vous pouvez ouvrir le fichier qui a été créé dans l’emplacement src/Command/CreateUserCommand.php.
+
+<?php
+// src/Command/CreateUserCommand.php
+
+namespace App\Command;
+
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+#[AsCommand(
+    name: 'app:create-user',
+    description: 'Add a short description for your command',
+)]
+class CreateUserCommand extends Command
+{
+    protected function configure(): void
+    {
+        $this
+            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+        ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $arg1 = $input->getArgument('arg1');
+
+        if ($arg1) {
+            $io->note(sprintf('You passed an argument: %s', $arg1));
+        }
+
+        if ($input->getOption('option1')) {
+            $io->note(sprintf('You passed an option: %s', $input->getOption('option1')));
+        }
+
+        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+        return Command::SUCCESS;
+    }
+}
+
+Enfin vous pouvez modifier le contenu de la classe afin d’avoir le comportement que vous attendez.
+
+Puis exécuter votre commande :
+
+symfony console app:create-user
+Sans le MakerBundle :
+Créer le répertoire Command dans le dossier src/ :
+
+mkdir -p src/Command
+Ensuite créer la classe qui contiendra votre commande dans le dossier src/Command/ :
+
+touch src/Command/CreateUserCommand.php
+Puis nous allons coller le contenu suivant dans le nouveau fichier :
+
+<?php
+// src/Command/CreateUserCommand.php
+
+namespace App\Command;
+
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+#[AsCommand(
+    name: 'app:create-user',
+    description: 'Add a short description for your command',
+)]
+class CreateUserCommand extends Command
+{
+    protected function configure(): void
+    {
+        $this
+            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+        ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $arg1 = $input->getArgument('arg1');
+
+        if ($arg1) {
+            $io->note(sprintf('You passed an argument: %s', $arg1));
+        }
+
+        if ($input->getOption('option1')) {
+            $io->note(sprintf('You passed an option: %s', $input->getOption('option1')));
+        }
+
+        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+        return Command::SUCCESS;
+    }
+}
+
+Enfin personnaliser la classe pour votre commande.
+
+Et tester votre commande :
+
+symfony console app:create-user
+Symfony 6 Créer une commande - Résultat de commande
+Sources :
+
+https://symfony.com/doc/current/console.html
+Susceptible de vous intéresser :
