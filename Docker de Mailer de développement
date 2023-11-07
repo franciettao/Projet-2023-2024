@@ -1,0 +1,119 @@
+Pour envoyer des mails lors du développement de notre application, nous allons utiliser l’image Docker Maildev qui est un Docker de Mailer de développement. Ce Mailler va nous être utile lors du développement de notre application pour ne pas utiliser un Mailler qui est production et qui pourrais envoyer des mails non voulus en cas de bug présent dans notre application.
+
+Logo Docker
+Prérequis :
+Avoir installer Docker et Docker-compose sur sa machine (Debian / Windows)
+Déploiement du Mailer de développement avec Docker :
+Pour commencer, nous allons utiliser un nouveau répertoire dans lequel nous allons créer un fichier docker-compose.yml
+
+Puis dans le fichier docker-compose.yml nous allons y ajouter le contenu suivant :
+
+version: '3.3'
+services:
+  maildev:
+    hostname: maildev
+    image: maildev/maildev
+    command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+    restart: always
+    ports:
+      - "1080:80"
+      - "25:25"
+
+Puis ensuite depuis un terminal en vous plaçant au niveau du fichier docker-compose.yml saisissez la commande suivant :
+
+docker-compose up -d
+Une fois démarré, le docker maildev est désormais accessible par l’url suivant : http://localhost:1080
+
+Docker Mailer de développement - Interface de Maildev
+Vous pouvez désormais envoyer des mails avec pour serveur hôte : localhost et port smtp : 25
+
+Sources :
+
+https://hub.docker.com/r/maildev/maildev
+Tester le Mailler de Développement Docker (Maildev) avec PHP :
+Nous allons reprendre le code utiliser dans cette procédure : PHP Envoyer des mails que je vous conseil de suivre pour avoir plus d’explication.
+
+Dans notre serveur Web nous allons créer un nouveau dossier dans lequel on va mettre notre code pour envoyer un mail mais aussi pour inclure la librairie PHPMAILER (à l’aide de composer).
+
+mkdir -p /var/www/html/test_mail && cd /var/www/html/test_mail 
+Puis on importe PHPMAILER avec composer (Debian) :
+
+composer require phpmailer/phpmailer
+Après avoir créer le répertoire, nous allons y ajouter notre code qui envoie le mail dans un fichier appelé index.php :
+
+<?php
+
+require './vendor/autoload.php';
+ 
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\PHPMailer;
+ 
+// Configuration des informations SMTP
+define("SMTP_HOST", "127.0.0.1");
+define("SMTP_PORT", 25);
+define("SMTP_SECURE", false);
+define("SMTP_AUTH", false);
+define("SMTP_SENDER", "exemple@votre-domaine.fr");
+define("SMTP_USER", "");
+define("SMTP_PASS", "");
+ 
+/**
+ * Envoie un mail
+ *
+ * @param string $destinataire
+ * @param string $sujet
+ * @param string $mail_body_format_html
+ * @param string $alt_message
+ * @return void
+ */
+function sendMail(string $destinataire, string $sujet, string $mail_body_format_html, string $alt_message="" ):void
+{
+    try {
+        $mail = new PHPMailer(true);
+        //Server settings
+        $mail->SMTPDebug = SMTP::DEBUG_OFF;                         // Activer l'option de d'affichage de debug : SMTP::DEBUG_SERVER;
+        $mail->isSMTP();                                            // Configuration de la méthode d'envoie en SMTP
+        $mail->Host       = SMTP_HOST;                              // Configuration de l'hote du serveur SMTP
+        $mail->SMTPAuth   = SMTP_AUTH;                              // Configuration de l'authentification SMTP
+        if(SMTP_AUTH){
+            $mail->Username   = SMTP_USER;                          // Configuration de l'utilisateur SMTP
+            $mail->Password   = SMTP_PASS;                          // Configuration du mot de passe SMTP
+        }
+        if(SMTP_SECURE) {
+            $mail->SMTPSecure = "ssl";                              // Configuration du chiffrement SSL SMTP
+        }
+        $mail->Port       = SMTP_PORT;                              // Configuration du port du serveur SMTP
+    
+        $mail->setFrom(SMTP_SENDER, 'Surnom');                      // Ajout de l'expéditeur
+        $mail->addAddress($destinataire);                           // Ajout d'un destinataire
+        // Contenu
+        $mail->CharSet = 'UTF-8';                                   // Configuration de l'encodage en UTF-8
+        $mail->isHTML(true);                                        // Configuration du mail au format HTML
+        $mail->Subject = $sujet;                                    // Configuration du sujet du mail
+        $mail->Body    = $mail_body_format_html;                    // Configuration du contenu du mail
+        if(!empty($alt_message)){
+            $mail->AltBody = $alt_message;
+        }else {
+            $mail->AltBody = 'Si ce mail ne s\'affiche pas correctement, veuillez utiliser un client mail/navigateur plus récent.';
+        }
+    
+        $mail->send();
+        echo 'Le mail a été envoyé !';
+    } catch (Exception $e) {
+        if(isset($mail)){
+            echo "Le mail n'a pas pu être envoyé. Erreur : {$mail->ErrorInfo}";
+        } else {
+            echo "Le mail n'a pas pu être envoyé. Erreur : {$e->getMessage()}";
+        }
+    }
+}
+
+sendMail("test@test.com", "Mail de test", "Contenu de test");
+Puis exécuter votre code php :
+
+php /var/www/html/test_mail/index.php
+Enfin vous recevez le mail sur le Mailer Docker (MailDev) :
+
+Docker Mailer de développement - Réception de mail avec MailDev
+Si vous recevez ce mail alors tous a fonctionné, le Docker du Mailler et l’envoie avec le code PHP pour votre application !
+
