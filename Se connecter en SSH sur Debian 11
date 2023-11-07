@@ -1,0 +1,117 @@
+Sur Debian 11 il est possible de se connecter à distance sur la machine pour y exécuter des commandes. Dans cette procédure je vais vous montrer comment vous connecter à distance sur une machine Debian 11 à l’aide du protocole SSH (Secure Shell). SSH est le petit frère de Telnet, ils fonctionnent principalement de la même manière sauf que le SSH utilise un système de chiffrement entre les machines. Le système de chiffrement permet de dissimuler les communications qu’il y a entre les deux machines.
+
+Logo SSH
+Prérequis :
+Une machine sur Debian
+Une machine cliente qui va servir à se connecter à distance
+Installer SSH sur Debian 11 :
+Avant d’installer SSH sur votre machine, assurez-vous qu’elle soit à jour :
+
+sudo apt update && sudo apt upgrade -y
+Ensuite, il faut installer le paquet openssh-server :
+
+sudo apt install openssh-server
+Puis on active et on démarre le service SSH :
+
+sudo systemctl enable ssh
+sudo systemctl start ssh
+Enfin depuis une autre machine (peu importe son système d’exploitation) avec un terminal on peut se connecter sur la machine avec cette commande :
+
+ssh utilisateur@ip-machine
+Autoriser la connexion avec l’utilisateur root
+Attention la connexion ssh avec le compte utilisateur root est par défaut désactiver.
+Je ne recommande pas de l’activer, mais si vous en avez besoin, vous devez éditer le fichier de configuration du serveur SSH :
+
+# avec Nano
+sudo nano /etc/ssh/sshd_config 
+# ou avec Vim 
+sudo vim /etc/ssh/sshd_config
+Puis ensuite retirer le commentaire devant « PermitRootLogin » et remplacer la valeur par défaut à yes :
+
+PermitRootLogin yes
+Puis redémarrer le service SSH :
+
+sudo systemctl restart ssh
+Se connecter sans mots de passe (Sécurisé avec clé publique)
+Se connecter en SSH est très pratique mais à chaque fois devoir saisir le mot de passe peut vite nous faire perdre beaucoup de temps. Il est possible de se connecter en SSH sans mot de passe avec une clé publique.
+
+Activation de l’authentification par clé publique
+Pour activer l’authentification avec une clé publique dans SSH, il faut éditer le fichier de configuration du serveur SSH :
+
+# avec Nano
+sudo nano /etc/ssh/sshd_config 
+# ou avec Vim 
+sudo vim /etc/ssh/sshd_config
+Ensuite il faut modifier la ligne PubkeyAuthentication, en retirant le commentaire et en mettant comme valeur : yes
+
+PubkeyAuthentication yes
+Puis redémarrer le service SSH :
+
+sudo systemctl restart ssh
+Génération de la paire de clés
+Pour générer la clé publique, depuis la machine qui va se connecter sur le serveur, il faut saisir une commande dans un terminal qui va générer la paire de clé.
+
+La commande va vous demander si vous souhaitez renommer le fichier qui contiendra la clé, mais c’est facultatif.
+
+Elle va aussi vous demander si vous souhaitez ajouter une passphrase qui est également facultative.
+
+ssh-keygen -t rsa
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/aymeric/.ssh/id_rsa): 
+Created directory '/home/aymeric/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/aymeric/.ssh/id_rsa
+Your public key has been saved in /home/aymeric/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256: **********
+
+Envoie de la paire de clé sur le serveur
+Pour pouvoir se connecter sur le serveur sans identifiant, il faut lui transmettre une clé, pour faire ça, on le fait avec la commande suivante :
+
+ssh-copy-id utilisateur@ip-serveur
+Il est désormais possible de se connecter sur la machine sans mot de passe avec la commande :
+
+ssh utilisateur@ip-serveur
+Cette opération est réalisable depuis plusieurs clients, sur le serveur elle va ajouter plusieurs lignes dans le fichier ~/.ssh/authorized_keys sur le serveur. Chaque ligne correspondra à une clé d’un client.
+
+Transférer des fichiers avec SSH :
+Une fois que le serveur SSH est démarré, il est possible de transférer des fichiers soit en SCP ou en SFTP. Le SFTP est plus interactif (ex: possibilité de créer/supprimer des dossiers …) que le SCP mais les deux permettent de transférer des fichiers. Les deux sont utilisables en ligne de commande ou avec une interface graphique.
+
+SFTP :
+La ligne de commandes :
+En ligne de commande, pour se connecter il faut utiliser cette commande :
+
+sftp utilisateur@ip-serveur
+Voici une liste des commandes importantes pour l’utilisation de SFTP en ligne de commande :
+
+ls : afficher les dossiers/fichiers
+mkdir : creer un dossier
+cd : se rendre dans un dossier ("cd .." pour remonter d'un dossier) 
+pwd : afficher l'emplacement
+get : télécharger un fichier 
+put : envoyer un fichier 
+exit : Quitter la connexion SFTP
+L’interface graphique :
+L’interface graphique se fait avec une application qu’il faudra télécharger, je vous conseille d’utiliser :
+
+FileZilla
+Remmina (Linux)
+Pour chacun de ces logiciels, il suffira de se connecter au serveur avec vos accès et choisir le protocole SFTP, puis vous allez avoir accès à un explorateur de fichiers qui va vous permettre de transférer vos fichiers.
+
+SCP :
+La ligne de commandes :
+Voici comment utiliser SCP en ligne de commande :
+
+scp emplacement-local utilisateur@ip-serveur:emplacement-serveur
+L’interface graphique :
+Il existe plusieurs logiciels pour effectuer du SCP avec une interface graphique, je vous conseille :
+
+FileZilla
+WinScp (Windows)
+Pour les logiciels qui permettent de proposer une connexion SCP, il suffit de renseigner ses informations de connexion puis de choisir le protocole SCP. Une fois connecter, vous allez avoir un explorateur de fichier qui va vous permettre de gérer le transfert de fichier de votre machine cliente et de votre machine serveur.
+
+Source :
+
+https://wiki.debian.org/fr/SSH
