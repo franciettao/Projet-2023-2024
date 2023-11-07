@@ -1,0 +1,48 @@
+Dans cette procédure, je vais vous expliquer comment installer Homeassistant sur un serveur Proxmox. Homeassistant est un serveur de domotique gratuit et open source. Homeassistant est selon moi le meilleur service open source pour gérer sa domotique grâce à son interface moderne et ses multiples possibilités contrairement à Domoticz et autres.
+
+Logo de Homeassistant
+Prérequis pour installer Homeassistant sur Proxmox :
+Avoir un serveur Proxmox avec les permissions root
+Installer Homeassistant sur Proxmox :
+Dans un premier temps, vous allez devoir vous rendre sur votre PVE Proxmox en shell (depuis l’hôte) et exécuter la commande suivante :
+
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/blob/main/vm/haos-vm-v5.sh)"
+Cette commande va créer une machine virtuelle « Homeassistant » sur votre serveur Proxmox à l’aide d’un script bash que vous pouvez consulter en détail en collant le lien du script dans un navigateur.
+
+Dans un premier temps le programme d’installation va nous demander une confirmation d’installation :
+
+Installer Homeassistant sur Proxmox - Autoriser le programme d'installation
+Ensuite le programme a nous demander si nous voulons utiliser les paramètres par défaut (Vous pouvez vous rendre dans « Advenced » si vous souhaitez changer des paramètres) :
+
+Installer Homeassistant sur Proxmox - Utiliser les paramètres par défauts
+Puis ensuite le programme va se charger de créer la nouvelle machine virtuelle et la paramétrée :
+
+Installer Homeassistant sur Proxmox - Fin de l'installation
+Enfin il faudra ouvrir la console de la nouvelle machine virtuelle afin d’obtenir l’adresse ip locale de Homeassistant :
+
+Installer Homeassistant sur Proxmox - Trouver l'adresse IP locale de homeassistant
+Puis vous pouvez vous rendre depuis un navigateur sur l’URL transmise par Homeassistant et créez votre compte :
+
+Installer Homeassistant sur Proxmox - Création d'un compte
+Ensuite configurer votre « Maison » de la manière suivante en personnalisant en fonction de vos préférences :
+
+Personnaliser les préférences Homeassistant
+Puis configurer la télémétrie en fonction de vos préférences pour partager vos données afin d’améliorer le service Homeassistant :
+
+Configurer la télémétrie Homeassistant
+Configurer Homeassistant avec une adresse IP fixe :
+Connecter vous sur votre serveur Homeassistant puis rendez-vous dans « Paramètres » => « Système » :
+
+Configurer une adresse ip fixe sur Homeassistant - etape 1
+Puis rendez-vous dans la section « Réseau » :
+
+Configurer une adresse ip fixe sur Homeassistant - etape 2
+Et ensuite sélectionner « IP V4 » et « Ip fixe » pour la configurée en fonction de votre besoin et de votre réseau :
+
+Configurer une adresse ip fixe sur Homeassistant - etape 3
+Une fois cette opération faite, vous pouvez saisir dans votre navigateur l’url suivante : http://nouvelle-adresse-ip:8123
+
+Sources :
+
+https://github.com/tteck/Proxmox/blob/main/vm/haos-vm-v5.sh
+https://www.home-assistant.io/installation/
