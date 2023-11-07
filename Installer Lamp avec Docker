@@ -1,0 +1,76 @@
+Installer Lamp avec Docker
+/ Virtualisation et docker / Par Aymeric Cucherousset
+Dans cette procédure je vais vous montrer comment installer un docker Lamp (Apache, Mariadb, Php, PhpMyAdmin) avec Docker-compose. Cette solution permet au développeur de produire des applications rapidement dans le même environnement que de production ainsi que de bénéficier des autres avantages de Docker.
+
+Prérequis :
+Docker (Windows ou Debian …)
+Docker-compose
+Logo installer Docker
+Installer Lamp avec Docker :
+Pour commencer l’installation il faudra se procurer le fichier Docker-compose.yml que je met à votre disposition :
+
+La dernière version de mon fichier docker compose se trouve sur mon Github.
+
+version: '3.7'
+
+services: 
+  db:
+    image: mariadb:10
+    container_name: db_lamp
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backups:/backups
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+      MYSQL_ROOT_PASSWORD: root
+
+  web:
+    image: "php:7.4-apache"
+    container_name: apache2
+    restart: always
+    depends_on: ['db']
+    ports: ['80:80']
+    links: ['db:db']
+    volumes:
+      - './www:/var/www/html'
+    environment:
+      MYSQL_DB_HOST: db
+      MYSQL_DATABASE: test
+      MYSQL_USER: user 
+      MYSQL_PASSWORD: user
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    container_name: phpmyadmin
+    restart: always
+    depends_on: ['db']
+    ports: ['1200:80']
+    links: ['db:db']
+    environment:
+      - MYSQL_DB_HOST=db
+      - MYSQL_USER=user 
+      - MYSQL_PASSWORD=user
+
+
+
+volumes:
+  db_data: {}
+Ensuite il faudra le placer dans un dossier, que vous aller utiliser uniquement pour votre container Lamp.
+Puis il faudra créer deux dossiers dans ce répertoire :
+
+www
+backups
+Je vous recommande de changer les identifiants et mots de passe de configuration MYSQL.
+
+Puis à l’aide de cette commande depuis un terminal / invite de commande à l’emplacement de votre fichier docker-compose permettra de démarrer le docker :
+
+docker-compose up -d
+La composition du fichier docker-compose.yml est totalement personnalisable. Il est possible d’ajouter d’autres services à cette installation. Vous pouvez aussi installer Portainer pour gérer vos containers. Portainer est une interface graphique qui permet de gérer ses containers.
+
+Source :
+
+https://docs.docker.com/
