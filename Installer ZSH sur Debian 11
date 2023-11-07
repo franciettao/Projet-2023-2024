@@ -1,0 +1,61 @@
+ZSH est un Shell interactif qui vus permet de gagner du temps lors de l’utilisation de ce Shell. Dans cette procédure, je vais vous montrer comment installer ZSH sur une machine Debian 11 (Bullseye). Ainsi que l’installation de Oh My Zsh qui nous permettra d’installer des thèmes et des plugins afin de rendre notre Shell dynamique. D’autres shell dynamiques existent (comme Fish) mais sont moins réputés que ZSH.
+
+ZSH
+Prérequis :
+Avoir une machine sous le système d’exploitation Debian 11 (Bullseye)
+Avoir les permissions root sur la machine
+Installer ZSH sur Debian 11:
+Avant de commencer l’installation de ZSH, nous allons d’abord mettre à jours la liste des paquets :
+
+apt update
+Ensuite vous pouvez télécharger le paquet zsh :
+
+apt install zsh -y
+Puis nous allons changer le Shell utilisé par l’utilisateur actuel (cette commande doit être exécuté sur tous les utilisateurs de la machine afin d’avoir ZSH) :
+
+chsh -s $(which zsh)
+Fermer le terminal actuel et ouvrer un nouveau terminal pour que ZSH soit utilisé.
+
+Installer OMZ (OH MY ZSH) sur Debian 11 :
+Nous allons installer OH MY ZSH qui permet d’ajouter des thèmes et des plugins dans ZSH.
+Pour commencer, nous allons d’abord installer git et curl :
+
+apt install curl git
+Puis nous allons installer OMZ :
+
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+Installer ZSH sur Debian 11 - Installation de OMZ
+Configuration de OMZ sur Debian 11 :
+Les configurations de OMZ se font dans le fichier ~/.zshrc
+
+Pour changer le thème (liste de thèmes OMZ), modifier la ligne :
+
+nano ~/.zshrc
+ZSH_THEME="robbyrussell"
+# Par 
+ZSH_THEME="nouveau_theme"
+Puis nous allons installer les plugins d’autocomplétion ainsi que de surlignage :
+
+git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+Ensuite nous ajoutons les plugins dans la configurations de zsh (~/.zshrc) en modifiant la ligne :
+
+nano ~/.zshrc
+plugins=(git)
+# par 
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+Puis après avoir redémarrer le terminal, nous aurons les fonctionnalités des plugins.
+
+D’autres plugins ZSH sont disponibles ici : https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins en procédant de la même manière qu’avec l’installation des plugins précédemment.
+
+Vous pouvez également mettre à jour votre Shell avec la commande suivant :
+
+omz update
+Pour retirer ZSH de Debian il faut exécuter cette commande :
+
+apt --purge remove zsh && chsh -s $(which "BASH")
+Sources :
+
+https://www.zsh.org/
+https://ohmyz.sh/
+https://github.com/ohmyzsh/ohmyzsh/
