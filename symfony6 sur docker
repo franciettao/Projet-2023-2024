@@ -1,0 +1,98 @@
+Dans cette procédure je vais vous montrer comment utiliser Docker avec son application Symfony 6 et sa base de données. Dans cette procédure je vais utiliser une base de donnée Postgresql mais il est possible de suivre la méthode en adaptant pour votre SGBD.
+
+Logo Symfony
+Prérequis :
+Un projet Symfony 6
+Avoir Docker et Docker compose d’installé (Windows / Debian)
+Utiliser Docker pour son projet Symfony 6 :
+Dans un premier temps, nous allons nous rendre dans le répertoire de nôtre projet Symfony 6 et nous allons créer 2 fichiers.
+
+Le fichier Dockerfile :
+
+FROM php:8.1-fpm-alpine
+
+# Install dépeencies
+RUN set -ex \
+  && apk --no-cache add \
+    postgresql-dev
+
+RUN docker-php-ext-install pdo pdo_pgsql
+
+# Install PHP extensions
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions http
+
+
+RUN apk --no-cache update && apk --no-cache add bash && apk --no-cache add git
+
+# Install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
+
+# Install Symfony CLI
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash && apk add symfony-cli
+
+WORKDIR /var/www/
+Ensuite le fichier docker-compose.yaml :
+
+version: '3.3'
+
+services:
+  www:
+    build: ./
+    depends_on:
+      - postgresql
+    container_name: www_symfony
+    restart: always
+    ports:
+      - '8000:8000'
+    dns:
+      - 8.8.8.8
+    volumes:
+      - ./:/var/www/
+    command: "symfony server:start"
+    networks:
+      - rr-net
+
+  postgresql:
+    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    container_name: postgresql_symfony
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    networks:
+      - rr-net
+
+networks:
+  rr-net:
+    driver: bridge
+
+volumes:
+  db-data:
+
+Note: Les accès de la base de données se trouvent dans le fichier Dockercompose.yaml
+
+Puis modifier le fichier .ENV en vous assurant de mettre le nom du conteneur Docker au lieu de l’adresse IP de la variable DATABASE_URL
+
+Une fois que votre projet est bien configuré, vous pouvez utiliser la commande suivante pour démarrer le projet :
+
+docker-compose up -d --build
+L’option build doit être exécutée lorsqu’il y a des modifications dans votre image Docker.
+
+Une fois le projet démarré, il sera disponible depuis l’URL suivante : http://127.0.0.1/
+
+Utiliser Symfony 6 avec Docker
+Note : Il est possible d’utiliser un Makefile afin d’interagir plus simplement entre votre machine et le container.
+
+Sources :
+
+https://docs.docker.com/
+https://symfony.com/doc/current/index.html
