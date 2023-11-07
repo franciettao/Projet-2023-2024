@@ -1,0 +1,60 @@
+Pour automatiser l'installation de Cockpit avec Docker et ses dépendances sur Debian 12, vous pouvez utiliser le script suivant :
+
+bash
+Copy code
+#!/bin/bash
+
+# Vérification des privilèges
+if [ "$EUID" -ne 0 ]; then
+  echo "Ce script doit être exécuté en tant qu'administrateur (root)."
+  exit 1
+fi
+
+# Mise à jour du système
+apt update
+apt upgrade -y
+
+# Installation des dépendances
+apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Installation de Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# Démarrage et activation du service Docker
+systemctl enable docker
+systemctl start docker
+
+# Installation de Cockpit
+apt install -y cockpit
+
+# Activer le service Cockpit
+systemctl enable --now cockpit.socket
+
+# Ouvrir les ports nécessaires dans le pare-feu
+ufw allow 9090/tcp
+
+# Afficher l'état du service Cockpit
+systemctl status cockpit
+
+echo "Cockpit a été installé avec succès. Vous pouvez accéder à l'interface web à l'adresse : https://VOTRE_ADRESSE_IP:9090"
+Assurez-vous que le script a des permissions d'exécution avec la commande :
+
+bash
+Copy code
+chmod +x script_install_cockpit.sh
+Ensuite, exécutez le script avec les privilèges administratifs :
+
+bash
+Copy code
+sudo ./script_install_cockpit.sh
+Le script effectuera les étapes suivantes :
+
+Mettre à jour le système.
+Installer les dépendances requises.
+Installer Docker.
+Démarrer et activer le service Docker.
+Installer Cockpit.
+Activer le service Cockpit et ouvrir le port 9090 dans le pare-feu.
+Afficher l'état du service Cockpit et fournir l'adresse pour accéder à l'interface web.
+Vous pourrez ensuite accéder à l'interface web de Cockpit en utilisant votre navigateur à l'adresse : https://VOTRE_ADRESSE_IP:9090. Assurez-vous de remplacer VOTRE_ADRESSE_IP par l'adresse IP de votre serveur.
