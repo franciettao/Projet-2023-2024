@@ -1,0 +1,194 @@
+Dans cette procédure, je vais vous expliquer comment tester l’API de l’un de vos projets Symfony 6 avec la librairie PHPUNIT. Cette procédure est compatible avec les Api ApiPlatform. Cette procédure a été rédiger avec une Api, Api Platform sur une entité Utilisateur.
+
+Logo Symfony
+Prérequis pour tester une API Symfony 6 :
+Une API Symfony 6
+La CLI Symfony
+Tester une API Symfony 6 :
+Avant de commencer, nous allons importer PhpUnit et tous les éléments pour réaliser les tests :
+
+composer require --dev symfony/test-pack
+Dans un premier temps, nous devons créer la base de données dans l’environnement de test :
+
+symfony console d:d:c --env=test
+Ensuite nous allons exécuter les migrations sur la base de données de l’environnement de test :
+
+symfony console d:m:m --env=test --no-interaction
+Puis nous allons chargés les Fixtures dans la base de données de l’environnement de test (Si vous n’aez pas de Fixtures, je vous conseille de regarder : Symfony 6 Fixtures).
+
+symfony console d:f:l --env=test --no-interaction
+Une fois que l’environnement de test est mis en place, nous pouvons créer nos premiers tests. Dans un premier temps nous allons créer un dossier qui va s’appeler « Func » (comme Functionnal Test) dans le dossier tests :
+
+mkdir -p tests/Func
+Puis nous allons créer le premier test de l’application :
+
+symfony console make:test
+ Which test type would you like?:
+  [TestCase       ] basic PHPUnit tests
+  [KernelTestCase ] basic tests that have access to Symfony services
+  [WebTestCase    ] to run browser-like scenarios, but that don't execute JavaScript code
+  [ApiTestCase    ] to run API-oriented scenarios
+  [PantherTestCase] to run e2e scenarios, using a real-browser or HTTP client and a real web server
+ > ApiTestCase
+
+
+Choose a class name for your test, like:
+ * UtilTest (to create tests/UtilTest.php)
+ * Service\UtilTest (to create tests/Service/UtilTest.php)
+ * \App\Tests\Service\UtilTest (to create tests/Service/UtilTest.php)
+
+ The name of the test class (e.g. BlogPostTest):
+ > \App\Tests\Func\UserTest    
+
+ created: tests/Func/UserTest.php
+
+           
+  Success! 
+           
+
+ Next: Open your new test class and start customizing it.
+ Find the documentation at https://api-platform.com/docs/distribution/testing/
+Ensuite nous allons nous rendre dans le fichier de test que nous avons créer (tests/Func/UserTest.php).
+Puis nous allons y ajouter nos premiers tests de l’API, voici un exemple pour l’endpoint /api/users/ d’une API :
+
+<?php
+
+namespace App\Tests\Func;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+
+class UserTest extends ApiTestCase
+{
+    private string $jwtToken;
+    private array $users;
+
+    public static function userLoggedIn(): string 
+    {
+        $response = static::createClient()->request('POST', '/api/login_check', ['json' => [
+            'username' => 'user0@example.com',
+            'password' => 'password',
+        ]]);
+        return $response->toArray()['token'];
+    }
+
+    public function testGetUsers(int $nbUsers = 10): void
+    {
+        // Test GET /api/users without auth
+        $response = static::createClient()->request('GET', '/api/users', ['headers' => ['Accept' => 'application/json']]);
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertJsonContains(['code' => 401, 'message' => 'JWT Token not found']);
+
+        // Test GET /api/users with auth
+        $this->jwtToken = self::userLoggedIn();
+
+        $response = static::createClient()->request('GET', '/api/users', ['headers' => ['Accept' => 'application/json'], 'auth_bearer' => $this->jwtToken]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        $this->assertCount($nbUsers, $response->toArray());
+
+        // Save users for later use
+        $this->users = $response->toArray();
+    }
+
+    public function testGetUser(): void
+    {
+        // Load users
+        $this->testGetUsers();
+        $first_user = array_shift($this->users);
+
+        // Test GET /api/users/{id} without auth
+        $response = static::createClient()->request('GET', '/api/users/'. $first_user['id'], ['headers' => ['Accept' => 'application/json']]);
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+
+        // Test GET /api/users/{id} with auth
+        $response = static::createClient()->request('GET', '/api/users/' . $first_user['id'], ['headers' => ['Accept' => 'application/json'], 'auth_bearer' => $this->jwtToken]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        $this->assertJsonContains(['id' => $first_user['id'], 'email' => $first_user['email']]);
+    }
+
+    public function testCreateUser(): void
+    {
+        // Test POST /api/users without auth
+        $response = static::createClient()->request('POST', '/api/users', ['headers' => ['Accept' => 'application/json'], 'json' => [
+            'email' => 'test-new-user@example.com',
+            'name' => 'test',
+            'firstname' => 'test',
+            'password' => 'password',
+            'roles' => ['ROLE_USER'],
+        ]]);
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+    }
+
+    public function deleteUser(): void
+    {
+        // Load users
+        $this->testGetUsers(11);
+        $last_user = array_pop($this->users);
+
+        // Test DELETE /api/users/{id} without auth
+        $response = static::createClient()->request('DELETE', '/api/users/' . $last_user['id'], ['headers' => ['Accept' => 'application/json']]);
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertJsonContains(['code' => 401, 'message' => 'JWT Token not found']);
+
+        // Test DELETE /api/users/{id} with auth
+        $response = static::createClient()->request('DELETE', '/api/users/' . $last_user['id'], ['headers' => ['Accept' => 'application/json'], 'auth_bearer' => $this->jwtToken]);
+        $this->assertResponseStatusCodeSame(204);
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+    }
+
+    public function testUpdateUser(): void
+    {
+        // Load users
+        $this->testGetUsers(11);
+        $first_user = array_shift($this->users);
+
+        // Test PUT /api/users/{id} without auth
+        $response = static::createClient()->request('PUT', '/api/users/' . $first_user['id'], ['headers' => ['Accept' => 'application/json'], 'json' => [
+            'email' => 'new-email@example.com',
+            'name' => 'new-name',
+            'firstname' => 'new-firstname',
+            'password' => 'new-password',
+            'roles' => ['ROLE_USER'],
+        ]]);
+
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertJsonContains(['code' => 401, 'message' => 'JWT Token not found']);
+
+        // Test PUT /api/users/{id} with auth
+        $this->jwtToken = self::userLoggedIn();
+
+        $response = static::createClient()->request('PUT', '/api/users/' . $first_user['id'], ['headers' => ['Accept' => 'application/json'], 'auth_bearer' => $this->jwtToken, 'json' => [
+            'email' => 'new-email@example.com',
+            'name' => 'new-name',
+            'firstname' => 'new-firstname',
+            'password' => 'new-password',
+            'roles' => ['ROLE_USER'],
+        ]]);
+        
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json; charset=utf-8');
+        $this->assertJsonContains(['email' => 'new-email@example.com', 'name' => 'new-name', 'firstname' => 'new-firstname']);
+    }
+}
+Ensuite on peut exécuter nôtre test avec la commande :
+
+php bin/phpunit
+# ou en réinitialisant la base de données avant les tests avec la commandes : 
+symfony console d:f:l --env=test --no-interaction && php bin/phpunit
+Résultats de l’exéction des des tests sur l’API.
+
+Symfony 6 Tester une Api - Résultats de tests 
+Sources :
+
+https://symfony.com/doc/current/testing.html
+https://api-platform.com/docs/distribution/testing/
+Conseil après avoir construit les tests d’une API :
+Je vous conseil d’automatiser les tests dans Github avec les « Actions » ou dans Gitlab avec les CI/CD.
+Cette fonctionnalité vous permettra d’exécuter automatiquement tous vous tests après un Commit dans Github/Gitlab.
+Ainsi vous pourrez voir si les commit répondent correctement aux tests que vous avez construit pour votre application.
