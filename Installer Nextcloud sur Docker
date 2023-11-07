@@ -1,0 +1,83 @@
+Installer Nextcloud sur Docker
+/ Virtualisation et docker / Par Aymeric Cucherousset
+Dans cette procédure, je vais vous expliquer comment installer Nextcloud sur Docker. Nextcloud est une solution open-source qui permet de consulter et éditer ses fichiers. Nextcloud est une solution moderne avec plus d’outils que d’autres solutions tel que Owncloud. En plus des outils déjà présents sur Owncloud, il est possible de télécharger des plugins supplémentaire.
+
+Nextcloud_Logo
+Prérequis :
+Docker (Debian, Windows)
+Emplacement de stockage
+Installer Nextcloud sur Docker :
+Pour débuter l’installation nous allons créer un dossier qui s’appellera ‘nextcloud’ sur la machine qui va héberger nextcloud.
+
+Dans le dossier que nous venons de créer, nous allons y ajouter quelques fichiers :
+
+Un dossier ‘nextcloud’
+Un dossier ‘db’
+Un fichier docker-compose.yml
+
+version: '3'
+
+volumes:
+  nextcloud:
+  db:
+
+services:
+  db:
+    image: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=$NEXTCLOUD_MYSQL_ROOT_PASSWORD
+      - MYSQL_PASSWORD=$NEXTCLOUD_MYSQL_PASSWORD
+      - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE
+      - MYSQL_USER=$NEXTCLOUD_MYSQL_USER
+
+  app:
+    image: nextcloud
+    restart: always
+    ports:
+      - $NEXTCLOUD_PORT:80
+    links:
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=$NEXTCLOUD_MYSQL_PASSWORD
+      - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE
+      - MYSQL_USER=$NEXTCLOUD_MYSQL_USER
+      - MYSQL_HOST=db
+Un fichier .env (je vous conseille de changer vos identifiants / mots de passes)
+NEXTCLOUD_MYSQL_DATABASE=nextcloud
+NEXTCLOUD_MYSQL_USER=nextcloud
+NEXTCLOUD_MYSQL_ROOT_PASSWORD=root_mysql_password
+NEXTCLOUD_MYSQL_PASSWORD=nextcloud_password
+NEXTCLOUD_PORT=8080
+Après avoir créer ces dossiers et fichiers, vous devriez avoir la structure suivante dans votre dossier nextcloud :
+
+nextcloud/
+├── db/ 
+├── nextcloud/
+├── .env
+└── docker-compose.yml
+Ensuite avec un terminal rendez-vous dans le dossier ‘Nextcloud’ et saisissez la commande suivante pour démarrer le docker Nextcloud :
+
+docker-compose up -d
+Ensuite Nextcloud sera accessible depuis un navigateur avec l’URL suivante : http://votre-ip:8080
+
+La page suivante va apparaître :
+
+installer nextcloud sur docker
+Créer un compte administrateur et appuyer sur le bouton « Terminer l’installation ».
+
+Source :
+
+https://nextcloud.com/
+Conseils après avoir installer Nextcloud sur Docker :
+Ajouter un Reverse Proxy pour accéder à NextCloud et depuis le Reverse Proxy.
+Depuis la machine NextCloud autoriser l’accès à la machine Reverse Proxy à l’aide d’un Firewall (ex: UFW).
+Changer les identifiants qui sont présents dans la procédure et dans le fichier .env .
+Ne pas ouvrir Nextcloud à l’extérieur de votre réseau, mais utiliser un VPN pour accéder à votre réseau depuis l’extérieur.
+Je vous conseil aussi de stocker vos données sur un nas qui fonctionne avec une technologie Raid.
+Faire des des backups sur une autre machine en cas de panne.
