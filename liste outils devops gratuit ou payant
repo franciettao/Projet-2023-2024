@@ -1,0 +1,52 @@
+Parmi les outils et services de la liste que j'ai fournie, certains sont gratuits, d'autres proposent des niveaux gratuits avec des fonctionnalités limitées, et d'autres sont payants. Voici une indication générale de la gratuité de certains de ces outils :
+
+**Gratuits ou offrent des niveaux gratuits** :
+1. Git (GitHub, GitLab, Bitbucket)
+2. Jenkins
+3. Travis CI (avec des limitations sur le nombre de builds)
+4. CircleCI (avec des limitations sur le nombre de builds)
+5. Docker
+6. Kubernetes (gratuit, mais vous payez pour les ressources cloud sous-jacentes)
+7. Ansible (open source)
+8. Terraform (open source)
+9. Docker Compose
+10. Prometheus (open source)
+11. Grafana (open source)
+12. ELK Stack (Elasticsearch, Logstash, Kibana) (open source)
+13. Nagios (open source)
+14. VirtualBox (open source)
+15. Vagrant (open source)
+16. Apache Maven (open source)
+17. Gradle (open source)
+18. npm (open source)
+19. OWASP ZAP (open source)
+20. Nessus (avec une version gratuite limitée)
+21. Security Monkey (open source)
+22. Jira (avec une version gratuite limitée)
+23. Trello (avec une version gratuite limitée)
+24. Asana (avec une version gratuite limitée)
+25. Redmine (open source)
+26. Git (open source)
+27. Mercurial (open source)
+28. SVN (Subversion) (open source)
+29. Mattermost (open source)
+30. Slack (avec des limitations sur l'historique des messages)
+31. Git-based documentation (Markdown, reStructuredText) (open source)
+32. Wiki (open source)
+33. SonarQube (avec une version gratuite limitée)
+34. JUnit (open source)
+35. Selenium (open source)
+
+**Peuvent être gratuits ou payants en fonction de l'utilisation** :
+1. AWS (Amazon Web Services) : AWS propose une offre gratuite limitée pour certains services, mais la plupart de ses services sont payants.
+2. Azure (Microsoft Azure) : Microsoft Azure propose une offre gratuite limitée pour certains services, mais la plupart de ses services sont payants.
+3. Google Cloud Platform (GCP) : GCP propose une offre gratuite limitée pour certains services, mais la plupart de ses services sont payants.
+
+**Payants** :
+1. New Relic
+2. Splunk
+3. PagerDuty
+4. OpsGenie
+5. VictorOps
+
+Veuillez noter que les niveaux gratuits ou les tarifs varient en fonction des fournisseurs de services cloud et des fournisseurs d'outils, et ils sont sujets à des modifications. Assurez-vous de vérifier les sites web officiels des fournisseurs pour obtenir les informations les plus récentes sur les tarifs et les niveaux gratuits.
